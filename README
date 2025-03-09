@@ -1,0 +1,84 @@
+# Générateur de Lignes d'Objet pour E-mails
+
+Cette application Streamlit utilise l'API OpenAI pour générer des lignes d'objet pertinentes et efficaces pour vos e-mails. Il vous suffit de saisir le contenu de votre e-mail, et l'application vous suggérera une ligne d'objet adaptée.
+
+## Fonctionnalités
+
+- Interface utilisateur élégante et intuitive
+- Génération de lignes d'objet pertinentes basées sur le contenu de l'e-mail
+- Historique des dernières générations
+- Support des modèles GPT-4 et GPT-3.5-Turbo
+- Personnalisation de la clé API OpenAI
+
+## Installation
+
+1. Clonez ce dépôt :
+```bash
+git clone https://github.com/username/email-subject-generator.git
+cd email-subject-generator
+```
+
+2. Installez les dépendances :
+```bash
+pip install -r requirements.txt
+```
+
+3. Configurez votre clé API OpenAI :
+   - Renommez le fichier `.env.example` en `.env`
+   - Ajoutez votre clé API OpenAI dans ce fichier
+
+## Utilisation
+
+1. Démarrez l'application :
+```bash
+streamlit run app.py
+```
+
+2. Ouvrez votre navigateur à l'adresse indiquée (généralement http://localhost:8501)
+
+3. Saisissez le contenu de votre e-mail dans la zone de texte
+
+4. Cliquez sur "Générer une ligne d'objet"
+
+5. La ligne d'objet suggérée apparaîtra en dessous
+
+## Configuration avancée
+
+Vous pouvez configurer l'application de trois façons :
+
+1. **Fichier .env** : Créez un fichier `.env` à la racine du projet avec votre clé API :
+```
+OPENAI_API_KEY=votre_clé_api_ici
+```
+
+2. **Interface utilisateur** : Entrez votre clé API directement dans le panneau latéral de l'application
+
+3. **Secrets Streamlit** : Pour les déploiements sur Streamlit Cloud, configurez votre clé API dans les secrets
+
+## Déploiement
+
+Cette application peut facilement être déployée sur Streamlit Cloud :
+
+1. Créez un compte sur [Streamlit Cloud](https://streamlit.io/cloud)
+2. Liez votre dépôt GitHub
+3. Configurez vos secrets dans les paramètres du déploiement
+
+## Structure du projet
+
+```
+.
+├── app.py                  # Application Streamlit principale
+├── requirements.txt        # Dépendances Python
+├── .env.example            # Exemple de fichier de configuration
+└── README.md               # Documentation
+```
+
+## Technologies utilisées
+
+- **Streamlit** : Framework pour l'interface utilisateur
+- **OpenAI API** : Pour la génération de texte avec GPT-4/GPT-3.5
+- **Python-dotenv** : Pour la gestion des variables d'environnement
+
+## Licence
+
+Ce projet est sous licence MIT. Voir le fichier LICENSE pour plus de détails.
