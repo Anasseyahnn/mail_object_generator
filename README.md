@@ -1,7 +1,5 @@
 # 📧 Email Subject Generator | Générateur de Lignes d'Objet
 
-![image](https://github.com/user-attachments/assets/affa5a4c-f132-4f4e-ac10-b5eb06bffbc3)
-
 
 Une application web qui utilise l'IA pour générer des lignes d'objet efficaces pour vos emails. Fini les "Re:", "Suivi" ou "Important" ! Obtenez des lignes d'objet qui incitent réellement à l'ouverture de vos messages.
 
@@ -17,7 +15,7 @@ Une application web qui utilise l'IA pour générer des lignes d'objet efficaces
 
 ## 📸 Capture d'écran
 
-![Capture d'écran de l'application](https://via.placeholder.com/800x450.png?text=Email+Subject+Generator+Screenshot)
+![image](https://github.com/user-attachments/assets/affa5a4c-f132-4f4e-ac10-b5eb06bffbc3)
 
 ## 🚀 Installation
 
@@ -119,6 +117,6 @@ Les contributions sont les bienvenues ! N'hésitez pas à :
 ---
 
 Développé avec ❤️ par [Me contacter](https://anasseyahnn.github.io/Anasseyahnn-wbs/contact.html)
-
+Acceder à l'application:  [Voir l'application](https://mail-object-generator.streamlit.app/)
 
 *Besoin d'aide ou vous avez des questions ? N'hésitez pas à ouvrir une issue !*
