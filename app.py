@@ -11,7 +11,6 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-
 # CSS personnalisé pour une belle interface
 def local_css():
     st.markdown("""
@@ -126,12 +125,6 @@ def local_css():
             background-color: var(--border);
         }
 
-        /* Animation de chargement */
-        .loading {
-            text-align: center;
-            padding: 2rem 0;
-        }
-
         /* Footer */
         .footer {
             text-align: center;
@@ -159,10 +152,8 @@ def local_css():
     </style>
     """, unsafe_allow_html=True)
 
-
 # Appliquer le CSS
 local_css()
-
 
 # Fonction pour vérifier et charger la clé API
 def load_api_key():
@@ -171,40 +162,23 @@ def load_api_key():
     api_key = os.getenv('OPENAI_API_KEY')
 
     # Si la clé n'est pas trouvée dans .env, essayer de la récupérer depuis Streamlit secrets
-    if not api_key and 'OPENAI_API_KEY' in st.secrets:
-        api_key = st.secrets['OPENAI_API_KEY']
+    if not api_key:
+        try:
+            api_key = st.secrets['OPENAI_API_KEY']
+        except:
+            pass
 
     return api_key
 
-
-# Système de gestion d'état pour le suivi du statut de l'API
-class SessionState:
-    def __init__(self):
-        self.api_key_status = None
-        self.api_key = None
-
-
-# Initialiser l'état de session
-if 'session_state' not in st.session_state:
-    st.session_state.session_state = SessionState()
-
-
-# Fonction pour afficher l'animation de chargement
-def loading_animation():
-    with st.spinner('Génération de la ligne d\'objet en cours...'):
-        st.markdown("""
-        <div class="loading">
-            <lottie-player
-                src="https://assets3.lottiefiles.com/packages/lf20_x62chJ.json"
-                background="transparent"
-                speed="1"
-                style="width: 300px; height: 300px; margin: 0 auto;"
-                loop
-                autoplay>
-            </lottie-player>
-        </div>
-        """, unsafe_allow_html=True)
-
+# Initialiser les variables de session si elles n'existent pas
+if 'api_key' not in st.session_state:
+    st.session_state.api_key = load_api_key() or ""
+    
+if 'api_key_status' not in st.session_state:
+    st.session_state.api_key_status = None
+    
+if 'history' not in st.session_state:
+    st.session_state.history = []
 
 # Création de l'invite système
 system_prompt = """
@@ -214,13 +188,11 @@ claire et pertinente. La ligne d'objet doit refléter le contenu principal de l'
 inciter le destinataire à l'ouvrir.
 """
 
-
 # Création de l'Invite utilisateur
 def user_prompt_for(email_content):
     user_prompt = f"Voici le contenu de l'e-mail :\n\n{email_content}\n\n"
     user_prompt += "Veuillez suggérer une ligne d'objet courte et appropriée pour cet e-mail."
     return user_prompt
-
 
 # Création d'une fonction pour préparer les messages pour OpenAI
 def messages_for(email_content):
@@ -229,20 +201,18 @@ def messages_for(email_content):
         {"role": "user", "content": user_prompt_for(email_content)}
     ]
 
-
 # Utilisation de l'API OpenAI pour suggérer une ligne d'objet
-def suggest_subject(email_content, api_key):
+def suggest_subject(email_content, api_key, model="gpt-4"):
     client = OpenAI(api_key=api_key)
 
     try:
         response = client.chat.completions.create(
-            model="gpt-4",  # ou "gpt-3.5-turbo" si vous préférez
+            model=model,
             messages=messages_for(email_content)
         )
         return response.choices[0].message.content, None
     except Exception as e:
         return None, str(e)
-
 
 # Sidebar pour les paramètres et informations
 with st.sidebar:
@@ -256,28 +226,28 @@ with st.sidebar:
         "Clé API OpenAI",
         type="password",
         help="Entrez votre clé API OpenAI (commence par 'sk-')",
-        value=st.session_state.session_state.api_key if st.session_state.session_state.api_key else ""
+        value=st.session_state.api_key
     )
 
     # Bouton pour vérifier/enregistrer la clé API
     if st.button("Vérifier la clé API"):
         if api_key_input:
             if api_key_input.startswith(("sk-", "sk-proj-")):
-                st.session_state.session_state.api_key = api_key_input
-                st.session_state.session_state.api_key_status = "valid"
+                st.session_state.api_key = api_key_input
+                st.session_state.api_key_status = "valid"
                 st.success("Clé API valide et enregistrée!")
             else:
-                st.session_state.session_state.api_key_status = "invalid"
+                st.session_state.api_key_status = "invalid"
                 st.error("Format de clé API invalide. Elle doit commencer par 'sk-' ou 'sk-proj-'")
         else:
             # Essayer de charger depuis .env ou secrets
             loaded_key = load_api_key()
             if loaded_key:
-                st.session_state.session_state.api_key = loaded_key
-                st.session_state.session_state.api_key_status = "valid"
+                st.session_state.api_key = loaded_key
+                st.session_state.api_key_status = "valid"
                 st.success("Clé API chargée avec succès depuis le fichier .env ou les secrets!")
             else:
-                st.session_state.session_state.api_key_status = "missing"
+                st.session_state.api_key_status = "missing"
                 st.error("Aucune clé API trouvée. Veuillez en entrer une.")
 
     st.markdown("---")
@@ -341,13 +311,13 @@ if generate_button:
         st.error("Veuillez entrer le contenu de l'e-mail")
     else:
         # Vérification de la clé API
-        api_key = st.session_state.session_state.api_key
+        api_key = st.session_state.api_key
 
         if not api_key:
-            # Essayer de charger depuis .env ou secrets
+            # Essayer de charger depuis .env ou secrets une dernière fois
             api_key = load_api_key()
             if api_key:
-                st.session_state.session_state.api_key = api_key
+                st.session_state.api_key = api_key
             else:
                 st.error("Aucune clé API trouvée. Veuillez configurer votre clé API dans le panneau latéral.")
                 st.stop()
@@ -355,7 +325,7 @@ if generate_button:
         # Animation de chargement
         with st.spinner('Génération de la ligne d\'objet en cours...'):
             # Appeler l'API OpenAI
-            subject, error = suggest_subject(email_content, api_key)
+            subject, error = suggest_subject(email_content, api_key, model_option)
 
             if error:
                 st.error(f"Erreur lors de l'appel à l'API OpenAI: {error}")
@@ -366,10 +336,6 @@ if generate_button:
                 st.markdown(f'<p class="result-content">{subject}</p>', unsafe_allow_html=True)
                 st.markdown('</div>', unsafe_allow_html=True)
 
-                # Historique des générations
-                if 'history' not in st.session_state:
-                    st.session_state.history = []
-
                 # Ajouter à l'historique
                 st.session_state.history.append({
                     "email": email_content[:100] + "..." if len(email_content) > 100 else email_content,
@@ -377,7 +343,7 @@ if generate_button:
                 })
 
 # Afficher l'historique s'il existe
-if 'history' in st.session_state and st.session_state.history:
+if st.session_state.history:
     st.markdown('<hr>', unsafe_allow_html=True)
     st.markdown("### Historique des générations")
 
@@ -395,21 +361,4 @@ st.markdown("""
 <div class="footer">
     © 2025 - Générateur de Lignes d'Objet - Tous droits réservés
 </div>
-""", unsafe_allow_html=True)
-
-# Script pour ajouter des animations JavaScript
-st.markdown("""
-<script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
-<script>
-    // Animation des éléments au chargement
-    document.addEventListener('DOMContentLoaded', function() {
-        const elements = document.querySelectorAll('.card, .result-card');
-        elements.forEach((el, index) => {
-            setTimeout(() => {
-                el.style.opacity = '1';
-                el.style.transform = 'translateY(0)';
-            }, index * 100);
-        });
-    });
-</script>
 """, unsafe_allow_html=True)
