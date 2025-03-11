@@ -28,7 +28,7 @@ Une application web qui utilise l'IA pour générer des lignes d'objet efficaces
 
 ```bash
 # Cloner le dépôt
-git clone https://github.com/votre-username/email-subject-generator.git
+git clone https://github.com/Anasseyahanan/email-object-generator.git
 cd email-subject-generator
 
 # Installer les dépendances
